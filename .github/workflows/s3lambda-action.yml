@@ -11,6 +11,7 @@ jobs:
     - uses: actions/checkout@v1 
     - name: Test credentials - whoami
       run: aws sts get-caller-identity
+    - uses: mgenteluci/cloudformation-deploy-action@v1.4.0  
       env:
         TEMPLATE: 'lambda-s3/template.yml'
         AWS_STACK_NAME: 'stack-s3-lambda'

@@ -11,6 +11,7 @@ Parameters:
   BucketName:
     Description: S3 Bucket name
     Type: String
+    Default: bucket-for-lambda
 Resources:
   Bucket:
     Type: AWS::S3::Bucket

@@ -18,7 +18,7 @@ Resources:
       Runtime: nodejs12.x
       Events:
         S3Bucket:
-          Type: S3
+          Type: AWS::S3::S3Bucket
           Properties:
             Bucket: !Ref S3Bucket
             Events: 's3:ObjectCreated:*'
@@ -30,4 +30,4 @@ Resources:
       FunctionName: !Ref S3TriggeredLambdaHandler
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt S3Bucket.Arn 
-             
+

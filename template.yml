@@ -31,7 +31,7 @@ Resources:
       SourceAccount: !Ref "AWS::AccountId"
       SourceArn: !Sub "arn:aws:s3:::${BucketName}"
   BucketWatcher:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
       Description: Sends a Wait Condition signal to Handle when invoked
       Handler: index.handler
@@ -55,7 +55,7 @@ Resources:
       Key: !Ref Key
       Body: !Ref Body
   S3ObjectFunction:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties:
       Description: S3 Object Custom Resource
       Handler: index.handler

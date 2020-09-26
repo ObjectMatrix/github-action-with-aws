@@ -1,3 +1,5 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
 Description: Upload an object to an S3 bucket, triggering a Lambda event, returning the object key as a Stack Output.
 Parameters:
   Key:

@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Globals:
+  Function:
+    MemorySize: 128
+    Timeout: 15
+Resources:
+  # The Bucket
+  S3Bucket:
+    Type: AWS::S3::S3Bucket
+    # Function
+  S3TriggeredLambdaHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda.Handler
+      Description: fires when file in s3 stored
+      Runtime: nodejs12.x
+      Events:
+        S3Bucket:
+          Type: S3
+          Properties:
+            Bucket: !Ref S3Bucket
+            Events: 's3:ObjectCreated:*'
+  # Permission
+  AllowS3ToCallLambdaFunction:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref S3TriggeredLambdaHandler
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt S3Bucket.Arn 
+             

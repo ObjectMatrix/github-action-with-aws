@@ -36,41 +36,8 @@ Resources:
       Description: Sends a Wait Condition signal to Handle when invoked
       Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
-      Code:
-        ZipFile: !Sub |
-          exports.handler = function(event, context) {
-            console.log("Request received:\n", JSON.stringify(event));
-            var responseBody = JSON.stringify({
-              "Status" : "SUCCESS",
-              "UniqueId" : "Key",
-              "Data" : event.Records[0].s3.object.key,
-              "Reason" : ""
-            });
-            var https = require("https");
-            var url = require("url");
-            var parsedUrl = url.parse('${Handle}');
-            var options = {
-                hostname: parsedUrl.hostname,
-                port: 443,
-                path: parsedUrl.path,
-                method: "PUT",
-                headers: {
-                    "content-type": "",
-                    "content-length": responseBody.length
-                }
-            };
-            var request = https.request(options, function(response) {
-                console.log("Status code: " + response.statusCode);
-                console.log("Status message: " + response.statusMessage);
-                context.done();
-            });
-            request.on("error", function(error) {
-                console.log("send(..) failed executing https.request(..): " + error);
-                context.done();
-            });
-            request.write(responseBody);
-            request.end();
-          };
+      CodeUri: .
+      Handler: lambda.Handler
       Timeout: 30
       Runtime: nodejs4.3
   Handle:
@@ -93,41 +60,8 @@ Resources:
       Description: S3 Object Custom Resource
       Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
-      Code:
-        ZipFile: !Sub |
-          var response = require('cfn-response');
-          var AWS = require('aws-sdk');
-          var s3 = new AWS.S3();
-          exports.handler = function(event, context) {
-            console.log("Request received:\n", JSON.stringify(event));
-            var responseData = {};
-            if (event.RequestType == 'Create') {
-              var params = {
-                Bucket: event.ResourceProperties.Bucket,
-                Key: event.ResourceProperties.Key,
-                Body: event.ResourceProperties.Body
-              };
-              s3.putObject(params).promise().then(function(data) {
-                response.send(event, context, response.SUCCESS, responseData);
-              }).catch(function(err) {
-                console.log(JSON.stringify(err));
-                response.send(event, context, response.FAILED, responseData);
-              });
-            } else if (event.RequestType == 'Delete') {
-              var deleteParams = {
-                Bucket: event.ResourceProperties.Bucket,
-                Key: event.ResourceProperties.Key
-              };
-              s3.deleteObject(deleteParams).promise().then(function(data) {
-                response.send(event, context, response.SUCCESS, responseData);
-              }).catch(function(err) {
-                console.log(JSON.stringify(err));
-                response.send(event, context, response.FAILED, responseData);
-              });
-            } else {
-              response.send(event, context, response.SUCCESS, responseData);
-            }
-          };
+      CodeUri: .
+      Handler: lambda.Handler
       Timeout: 30
       Runtime: nodejs4.3
   LambdaExecutionRole:

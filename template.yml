@@ -1,93 +1,41 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
-Description: Upload an object to an S3 bucket, triggering a Lambda event, returning the object key as a Stack Output.
-Parameters:
-  Key:
-    Description: S3 Object key
-    Type: String
-    Default: test
-  Body:
-    Description: S3 Object body content
-    Type: String
-    Default: TEST CONTENT
-  BucketName:
-    Description: S3 Bucket name
-    Type: String
-    Default: bucket-balti
+AWSTemplateFormatVersion: 2010-09-09
 Resources:
-  Bucket:
+  S3Bucket:
     Type: AWS::S3::Bucket
-    DependsOn: BucketPermission
     Properties:
-      BucketName: !Ref BucketName
-      NotificationConfiguration:
-        LambdaConfigurations:
-        - Event: 's3:ObjectCreated:*'
-          Function: !GetAtt BucketWatcher.Arn
-  BucketPermission:
-    Type: AWS::Lambda::Permission
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+    DeletionPolicy: Retain
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
     Properties:
-      Action: 'lambda:InvokeFunction'
-      FunctionName: !Ref BucketWatcher
-      Principal: s3.amazonaws.com
-      SourceAccount: !Ref "AWS::AccountId"
-      SourceArn: !Sub "arn:aws:s3:::${BucketName}"
-  BucketWatcher:
-    Type: AWS::Serverless::Function
-    Properties:
-      Description: Sends a Wait Condition signal to Handle when invoked
-      Handler: index.handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      CodeUri: .
-      Handler: lambda.Handler
-      Timeout: 30
-      Runtime: nodejs12.x
-  Handle:
-    Type: AWS::CloudFormation::WaitConditionHandle
-  Wait:
-    Type: AWS::CloudFormation::WaitCondition
-    Properties:
-      Handle: !Ref Handle
-      Timeout: 300
-  S3Object:
-    Type: Custom::S3Object
-    Properties:
-      ServiceToken: !GetAtt S3ObjectFunction.Arn
-      Bucket: !Ref Bucket
-      Key: !Ref Key
-      Body: !Ref Body
-  S3ObjectFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Description: S3 Object Custom Resource
-      Handler: index.handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      CodeUri: .
-      Handler: lambda.Handler
-      Timeout: 30
-      Runtime: nodejs12.x
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+      PolicyDocument:
+        Id: MyPolicy
+        Version: 2012-10-17
         Statement:
-        - Effect: Allow
-          Principal: {Service: [lambda.amazonaws.com]}
-          Action: ['sts:AssumeRole']
-      Path: /
-      ManagedPolicyArns:
-      - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-      Policies:
-      - PolicyName: S3Policy
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 's3:PutObject'
-                - 'S3:DeleteObject'
-              Resource: !Sub "arn:aws:s3:::${BucketName}/${Key}"
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref S3Bucket
+                - /*
+      Bucket: !Ref S3Bucket
 Outputs:
-  Result:
-    Value: !GetAtt Wait.Data
+  WebsiteURL:
+    Value: !GetAtt 
+      - S3Bucket
+      - WebsiteURL
+    Description: URL for website hosted on S3
+  S3BucketSecureURL:
+    Value: !Join 
+      - ''
+      - - 'https://'
+        - !GetAtt 
+          - S3Bucket
+          - DomainName
+    Description: Name of S3 bucket to hold website content

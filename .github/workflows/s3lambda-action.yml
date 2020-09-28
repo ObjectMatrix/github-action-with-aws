@@ -26,3 +26,4 @@ jobs:
           name: asad-cluster
           template: template.yaml
           no-fail-on-empty-changeset: "1"
+          

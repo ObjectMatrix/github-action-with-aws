@@ -1,14 +1,8 @@
 AWSTemplateFormatVersion: 2010-09-09
-Parameters:
-  S3BucketName:
-  Type: String
-  Default: MyBucket
-  Description: Name of the S3 bucket
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref S3BucketName
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
@@ -28,13 +22,13 @@ Resources:
             Resource: !Join 
               - ''
               - - 'arn:aws:s3:::'
-                - !Ref S3BucketName
+                - !Ref S3Bucket
                 - /*
-      Bucket: !Ref S3BucketName
+      Bucket: !Ref S3Bucket
 Outputs:
   WebsiteURL:
     Value: !GetAtt 
-      - !Ref S3BucketName
+      - S3Bucket
       - WebsiteURL
     Description: URL for website hosted on S3
   S3BucketSecureURL:
@@ -42,6 +36,6 @@ Outputs:
       - ''
       - - 'https://'
         - !GetAtt 
-          - !Ref S3BucketName
+          - S3Bucket
           - DomainName
     Description: Name of S3 bucket to hold website content

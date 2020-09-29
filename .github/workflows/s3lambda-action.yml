@@ -27,4 +27,4 @@ jobs:
         with:
          name: MyStackBulti
          template: template.yml
-         parameter-overrides: "S3BucketName=ObjectMatrixBulti"
+#          parameter-overrides: "S3BucketName=ObjectMatrixBulti"

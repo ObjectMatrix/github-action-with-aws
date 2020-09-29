@@ -34,7 +34,7 @@ Resources:
 Outputs:
   WebsiteURL:
     Value: !GetAtt 
-      - S3BucketName
+      - !Ref S3BucketName
       - WebsiteURL
     Description: URL for website hosted on S3
   S3BucketSecureURL:
@@ -42,6 +42,6 @@ Outputs:
       - ''
       - - 'https://'
         - !GetAtt 
-          - S3BucketName
+          - !Ref S3BucketName
           - DomainName
     Description: Name of S3 bucket to hold website content

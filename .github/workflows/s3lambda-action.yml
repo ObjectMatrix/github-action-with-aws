@@ -20,11 +20,10 @@ jobs:
           aws-region: us-east-1
       - name: Force deployment
         run: |
-          aws cloudformation deploy --template template.yml --stack-name my-new-stack        
-      # - name: Deploy Amazon EKS Cluster
-      #   id: s3-cluster
-      #   uses: aws-actions/aws-cloudformation-github-deploy@master
-      #   with:
-      #     name: asad-cluster
-      #     template: template.yaml
-      #     no-fail-on-empty-changeset: "1"
+          aws cloudformation deploy --template template.yml --stack-name my-new-stack
+               
+      - name: Deploy to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+         name: MyStackBulti
+         template: template.yml

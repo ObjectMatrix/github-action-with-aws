@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
             
     steps:
-      - name: Run a script
-      - run: Hello, Show and Tell
         
       - name: Checkout
         uses: actions/checkout@v2
-            
+      - name: Run a script
+      - run: Hello, Show and Tell
+                
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
